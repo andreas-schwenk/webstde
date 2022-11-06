@@ -1,12 +1,33 @@
 // webSTDE - 2022 by Andreas Schwenk <contact@compiler-construction.com>
 // LICENSE: GPLv3
 
+import { drawState } from "./draw";
 import { JSON_Signal, JSON_State, JSON_Transition } from "./interfaces";
 
 export class StateMachine {
   private id = "";
   private states: State[] = [];
   private transitions: Transition[] = [];
+
+  public addState(state: State) {
+    this.states.push(state);
+    this.recalculateStateIndices();
+  }
+
+  public draw(ctx: CanvasRenderingContext2D) {
+    for (const state of this.states) state.draw(ctx);
+  }
+
+  public select(x: number, y: number): void {
+    for (const state of this.states) state.select(x, y);
+  }
+
+  private recalculateStateIndices(): void {
+    const n = this.states.length;
+    for (let i = 0; i < n; i++) {
+      this.states[i].setIdx(i);
+    }
+  }
 }
 
 export class Signal {
@@ -41,15 +62,48 @@ export enum SignalDirection {
 }
 
 export class State {
+  private selected = false;
   private x = 0;
   private y = 0;
+  private width = 220;
+  private height = 110;
   private id = "";
   private idx = 0;
   private desc = "";
   private mooreOutput: { [signalId: string]: string };
 
+  public constructor(x: number, y: number, id: string, desc = "") {
+    this.x = x;
+    this.y = y;
+    this.id = id;
+    this.desc = desc;
+  }
+
   public getIdx(): number {
     return this.idx;
+  }
+  public setIdx(idx: number): void {
+    this.idx = idx;
+  }
+
+  public draw(ctx: CanvasRenderingContext2D) {
+    drawState(
+      ctx,
+      this.selected,
+      this.x,
+      this.y,
+      this.width,
+      this.height,
+      this.id
+    );
+  }
+
+  public select(x: number, y: number): void {
+    this.selected =
+      x >= this.x - this.width / 2 &&
+      x <= this.x + this.width / 2 &&
+      y >= this.y - this.height / 2 &&
+      y <= this.y + this.height / 2;
   }
 
   public toJSON(): JSON_State {
