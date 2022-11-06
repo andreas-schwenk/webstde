@@ -1,6 +1,20 @@
 // webSTDE - 2022 by Andreas Schwenk <contact@compiler-construction.com>
 // LICENSE: GPLv3
 
+import { State, StateMachine } from "./machine";
+import { draw } from "./draw";
+
+export enum GuiState {
+  Select = "SELECT",
+  InsertMachineState = "INSERT_STATE",
+}
+export let guiState = GuiState.Select;
+
+export let mouseX = 0;
+export let mouseY = 0;
+
+export let machine = new StateMachine();
+
 export function init() {
   // help button
   const helpButton = document.getElementById("help") as HTMLButtonElement;
@@ -10,55 +24,52 @@ export function init() {
   };
 
   // select / insert buttons
-  const selectButton = document.getElementById("select");
+  const selectButton = document.getElementById("select") as HTMLInputElement;
+  selectButton.checked = true;
   selectButton.onclick = function () {
-    console.log("clicked select!");
+    guiState = GuiState.Select;
   };
-  const insertStartStateButton = document.getElementById("insertStartState");
+  const insertStartStateButton = document.getElementById(
+    "insertStartState"
+  ) as HTMLInputElement;
   insertStartStateButton.onclick = function () {
     console.log("clicked insert start state!");
   };
-  const insertStateButton = document.getElementById("insertState");
+  const insertStateButton = document.getElementById(
+    "insertState"
+  ) as HTMLInputElement;
   insertStateButton.onclick = function () {
-    console.log("clicked insert state!");
+    guiState = GuiState.InsertMachineState;
   };
-  const insertTransitionButton = document.getElementById("insertTransition");
+  const insertTransitionButton = document.getElementById(
+    "insertTransition"
+  ) as HTMLInputElement;
   insertTransitionButton.onclick = function () {
     console.log("clicked insert transition!");
   };
 
   // canvas
   const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+  const ctx = canvas.getContext("2d");
   canvas.addEventListener("mousemove", (event) => {
-    console.log(".");
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    mouseX = (event.clientX - rect.left) * dpr;
+    mouseY = (event.clientY - rect.top) * dpr;
+    draw(canvas, ctx);
   });
-
-  /*// main menu
-  const mainMenu = document.getElementById("mainMenu");
-  mainMenu.innerHTML = "";
-  addSpacing(mainMenu);
-  addButton(mainMenu, '<i class="fa-regular fa-circle-question"></i>', "help");*/
+  canvas.addEventListener("mouseup", (event) => {
+    switch (guiState) {
+      case GuiState.Select:
+        machine.select(mouseX, mouseY);
+        break;
+      case GuiState.InsertMachineState:
+        guiState = GuiState.Select;
+        selectButton.checked = true;
+        const machineState = new State(mouseX, mouseY, "", "");
+        machine.addState(machineState);
+        break;
+    }
+    draw(canvas, ctx);
+  });
 }
-
-/*
-export function addSpacing(mainMenu: HTMLElement) {
-  const spacing = document.createElement("span");
-  spacing.innerHTML = "&nbsp;";
-  mainMenu.appendChild(spacing);
-}
-
-export function addButton(
-  mainMenu: HTMLElement,
-  text: string,
-  tooltipText: string
-) {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.classList.add("btn", "btn-outline-dark");
-  button.title = tooltipText;
-  button.setAttribute("data-bs-toggle", "tooltip");
-  button.setAttribute("data-bs-placement", "button");
-  button.innerHTML = text;
-  mainMenu.appendChild(button);
-}
-*/
