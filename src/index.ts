@@ -1,72 +1,64 @@
-/* TODO: JSON format
-{
-  "signals": [
-    {"id":"x","type":"bit_n","bits":8,"io":"in","desc":"This is my desc text..."}
-  ],
-  "states": [
-    {"id":"start","x":100,"y":200,"q":{"y1":"1100","y2":"1100"},"desc":"Start state"}
-  ],
-  "transitions" [
-    {"u":0,"v":1,"u.angle":0,"v.angle":1,"cond":"x"}
-  ]
+// webSTDE - 2022 by Andreas Schwenk <contact@compiler-construction.com>
+// LICENSE: GPLv3
+
+export function init() {
+  // help button
+  const helpButton = document.getElementById("help") as HTMLButtonElement;
+  helpButton.onclick = function () {
+    const url = "help.html";
+    window.open(url, "_blank").focus();
+  };
+
+  // select / insert buttons
+  const selectButton = document.getElementById("select");
+  selectButton.onclick = function () {
+    console.log("clicked select!");
+  };
+  const insertStartStateButton = document.getElementById("insertStartState");
+  insertStartStateButton.onclick = function () {
+    console.log("clicked insert start state!");
+  };
+  const insertStateButton = document.getElementById("insertState");
+  insertStateButton.onclick = function () {
+    console.log("clicked insert state!");
+  };
+  const insertTransitionButton = document.getElementById("insertTransition");
+  insertTransitionButton.onclick = function () {
+    console.log("clicked insert transition!");
+  };
+
+  // canvas
+  const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+  canvas.addEventListener("mousemove", (event) => {
+    console.log(".");
+  });
+
+  /*// main menu
+  const mainMenu = document.getElementById("mainMenu");
+  mainMenu.innerHTML = "";
+  addSpacing(mainMenu);
+  addButton(mainMenu, '<i class="fa-regular fa-circle-question"></i>', "help");*/
+}
+
+/*
+export function addSpacing(mainMenu: HTMLElement) {
+  const spacing = document.createElement("span");
+  spacing.innerHTML = "&nbsp;";
+  mainMenu.appendChild(spacing);
+}
+
+export function addButton(
+  mainMenu: HTMLElement,
+  text: string,
+  tooltipText: string
+) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.classList.add("btn", "btn-outline-dark");
+  button.title = tooltipText;
+  button.setAttribute("data-bs-toggle", "tooltip");
+  button.setAttribute("data-bs-placement", "button");
+  button.innerHTML = text;
+  mainMenu.appendChild(button);
 }
 */
-
-export class StateMachine {
-  states: State[] = [];
-  transitions: Transition[] = [];
-}
-
-export enum SignalType {
-  Bit = "bit",
-  BitN = "bit_n",
-  Signed = "signed",
-  Unsigned = "unsigned",
-}
-
-export enum SignalDirection {
-  Input = "input",
-  Output = "output",
-  InputOutput = "inputOutput",
-}
-
-export class Signal {
-  id = "";
-  type = SignalType.Bit;
-  bits = 1;
-  direction = SignalDirection.Input;
-  desc = "";
-}
-
-export class State {
-  x = 0;
-  y = 0;
-  id = "";
-  idx = 0;
-  desc = "";
-  mooreOutput: { [signalId: string]: string };
-}
-
-export class Transition {
-  from: State;
-  to: State;
-  fromAngle = 0;
-  toAngle = 0;
-  condition = "";
-  mealyOutput: { [signalId: string]: string };
-
-  constructor(from: State, to: State) {
-    this.from = from;
-    this.to = to;
-  }
-
-  toJSON(): JSON {
-    return {
-      u: this.from.idx,
-      v: this.to.idx,
-      "u.angle": this.fromAngle,
-      "v.angle": this.toAngle,
-      cond: this.condition,
-    };
-  }
-}
