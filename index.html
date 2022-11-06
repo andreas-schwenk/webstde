@@ -16,7 +16,7 @@
     />
 
     <!-- TODO: ensure that latest(!!) version is loaded! -->
-    <!--<script src="build/mathebuddy-simulator.min.js"></script>-->
+    <script src="build/webstde.min.js"></script>
 
     <style>
       body,
@@ -35,10 +35,11 @@
   <body>
     <div class="container-fluid">
       <div class="row py-0">
-        <div class="col mb-1 py-2 bg-white shadow">
+        <div id="mainMenu" class="col mb-1 py-2 bg-white shadow">
           &nbsp;
           <button
             type="button"
+            id="help"
             class="btn btn-outline-dark"
             data-bs-toggle="tooltip"
             data-bs-placement="bottom"
@@ -622,6 +623,9 @@ end architecture;
     </div>
 
     <script>
+      webSTDE.init();
+
+      // ----- number converter -----
       var numberConverterBits = document.getElementById("numberConverterBits");
       var numberConverterHex = document.getElementById("numberConverterHex");
       var numberConverterDec = document.getElementById("numberConverterDec");
@@ -647,6 +651,7 @@ end architecture;
         numberConverterHex.value = "" + val.toString(16);
         numberConverterBin.value = "" + val.toString(2);
       });
+      // ----- end of number converter -----
 
       var c = document.getElementById("canvas");
       var ctx = c.getContext("2d");
