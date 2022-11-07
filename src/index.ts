@@ -7,6 +7,7 @@ import {
   SignalType,
   State,
   StateMachine,
+  Transition,
 } from "./machine";
 import { draw } from "./draw";
 import { Pos2D } from "./interfaces";
@@ -14,12 +15,16 @@ import { Pos2D } from "./interfaces";
 export enum GuiState {
   Select = "SELECT",
   InsertMachineState = "INSERT_STATE",
+  InsertMachineTransitionStart = "INSERT_TRANSITION_START",
+  InsertMachineTransitionEnd = "INSERT_TRANSITION_END",
 }
 export let guiState = GuiState.Select;
 
 export let mousePos: Pos2D = { x: 0, y: 0 };
 
 export let machine = new StateMachine();
+
+let transitionStartState: State = null;
 
 let canvas: HTMLCanvasElement = null;
 let ctx: CanvasRenderingContext2D = null;
@@ -60,7 +65,7 @@ export function init(): void {
     "insertTransition"
   ) as HTMLInputElement;
   insertTransitionButton.onclick = function () {
-    console.log("clicked insert transition!");
+    guiState = GuiState.InsertMachineTransitionStart;
   };
 
   // delete button
@@ -119,15 +124,16 @@ export function init(): void {
   });
 
   canvas.addEventListener("mouseup", (event) => {
+    let state: State = null;
     switch (guiState) {
       case GuiState.Select:
         machine.select(mousePos);
-        const s = machine.getSelectedStates();
-        if (s.length == 0) {
+        const states = machine.getSelectedStates();
+        if (states.length == 0) {
           selection.innerHTML = "(empty)";
         } else {
           selection.innerHTML = "";
-          const table = generateSelectionTable(s);
+          const table = generateSelectionTable(states);
           selection.appendChild(table);
         }
         break;
@@ -136,6 +142,23 @@ export function init(): void {
         selectButton.checked = true;
         const machineState = new State(mousePos, "");
         machine.addState(machineState);
+        break;
+      case GuiState.InsertMachineTransitionStart:
+        guiState = GuiState.InsertMachineTransitionEnd;
+        transitionStartState = machine.pickState(mousePos);
+        if (transitionStartState == null) {
+          guiState = GuiState.Select;
+          selectButton.checked = true;
+        }
+        break;
+      case GuiState.InsertMachineTransitionEnd:
+        state = machine.pickState(mousePos);
+        //console.log(transitionStartState);
+        //console.log(state);
+        const t = new Transition(transitionStartState, state);
+        machine.addTransition(t);
+        selectButton.checked = true;
+        guiState = GuiState.Select;
         break;
     }
     draw(canvas, ctx);
