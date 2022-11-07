@@ -1,7 +1,7 @@
 // webSTDE - 2022 by Andreas Schwenk <contact@compiler-construction.com>
 // LICENSE: GPLv3
 
-import { drawState } from "./draw";
+import { drawState, drawTransition } from "./draw";
 import {
   JSON_Signal,
   JSON_State,
@@ -25,12 +25,24 @@ export class StateMachine {
     this.recalculateStateIndices();
   }
 
+  public addTransition(t: Transition) {
+    this.transitions.push(t);
+  }
+
   public draw(ctx: CanvasRenderingContext2D) {
     for (const state of this.states) state.draw(ctx);
+    for (const t of this.transitions) t.draw(ctx);
   }
 
   public select(pos: Pos2D): void {
     for (const state of this.states) state.select(pos);
+  }
+
+  public pickState(pos: Pos2D): State {
+    for (const state of this.states) {
+      if (state.pick(pos)) return state;
+    }
+    return null;
   }
 
   public getSignals(): Signal[] {
@@ -247,12 +259,17 @@ export class State {
     drawState(ctx, this.selected, this.pos, this.width, this.height, this.id);
   }
 
-  public select(pos: Pos2D): void {
-    this.selected =
+  public pick(pos: Pos2D): boolean {
+    return (
       pos.x >= this.pos.x - this.width / 2 &&
       pos.x <= this.pos.x + this.width / 2 &&
       pos.y >= this.pos.y - this.height / 2 &&
-      pos.y <= this.pos.y + this.height / 2;
+      pos.y <= this.pos.y + this.height / 2
+    );
+  }
+
+  public select(pos: Pos2D): void {
+    this.selected = this.pick(pos);
   }
 
   public toJSON(): JSON_State {
@@ -274,10 +291,16 @@ export class Transition {
   private toAngle = 0;
   private condition = "";
   private mealyOutput: { [signalId: string]: string };
+  private selected = false;
 
   constructor(from: State, to: State) {
     this.from = from;
     this.to = to;
+  }
+
+  public draw(ctx: CanvasRenderingContext2D) {
+    //drawState(ctx, this.selected, this.pos, this.width, this.height, this.id);
+    drawTransition(ctx, this.selected, this.from.getPos(), this.to.getPos());
   }
 
   public toJSON(): JSON_Transition {
