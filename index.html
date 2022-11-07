@@ -12,7 +12,7 @@
     />
 
     <!-- TODO: ensure that latest(!!) version is loaded! -->
-    <script src="build/webstde.min.js"></script>
+    <script src="build/webstde.min.js?v=2022110700"></script>
 
     <style>
       body,
@@ -75,6 +75,7 @@
           </button>
           <button
             type="button"
+            id="save"
             class="btn btn-outline-dark"
             data-bs-toggle="tooltip"
             data-bs-placement="bottom"
@@ -211,6 +212,7 @@
           &nbsp;&nbsp;&nbsp;
           <button
             type="button"
+            id="delete"
             class="btn btn-outline-dark"
             data-bs-toggle="tooltip"
             data-bs-placement="bottom"
@@ -224,7 +226,7 @@
           <!--<i class="fa-solid fa-earth-europe"></i>-->
           &nbsp;&nbsp;&nbsp;
 
-          <div
+          <!--<div
             class="btn-group"
             data-bs-toggle="tooltip"
             data-bs-placement="bottom"
@@ -308,7 +310,7 @@
                 value="0000"
               />
             </div>
-          </div>
+          </div>-->
         </div>
       </div>
     </div>
@@ -326,11 +328,76 @@
         >
           <div class="row">
             <div class="col">
-              <h4 class="mt-3">SELECTED STATE</h4>
-              <table class="table table-bordered border-dark shadow">
+              <div class="my-4"></div>
+
+              <h4 class="mt-3">
+                <span id="numberConverterCollapse">
+                  <i class="fa-solid fa-square-plus"></i>
+                </span>
+                &nbsp; NUMBER CONVERTER
+              </h4>
+
+              <div
+                class="numberConverter"
+                id="numberConverter"
+                style="display: none"
+              >
+                <div class="input-group my-1">
+                  <span class="input-group-text border-secondary">HEX</span>
+                  <input
+                    type="text"
+                    class="form-control border-secondary"
+                    id="numberConverterHex"
+                    placeholder=""
+                    value="0"
+                  />
+                  &nbsp;
+                  <span class="input-group-text border-secondary">DEC</span>
+                  <input
+                    type="text"
+                    class="form-control border-secondary"
+                    id="numberConverterDec"
+                    placeholder=""
+                    value="0"
+                  />
+                </div>
+                <div class="input-group">
+                  <span class="input-group-text border-secondary">BITS</span>
+                  <input
+                    type="text"
+                    class="form-control border-secondary"
+                    id="numberConverterBits"
+                    placeholder=""
+                    value="4"
+                    style="max-width: 40px"
+                  />
+                  &nbsp;
+                  <span class="input-group-text border-secondary">BIN</span>
+                  <input
+                    type="text"
+                    class="form-control border-secondary"
+                    id="numberConverterBin"
+                    placeholder=""
+                    value="0000"
+                  />
+                </div>
+              </div>
+
+              <div class="my-4"></div>
+
+              <h4 class="mt-3">
+                <i class="fa-solid fa-square-minus"></i> &nbsp; SELECTION
+              </h4>
+
+              <div id="selection">(empty)</div>
+
+              <!-- XXX -->
+              <!--<table class="table table-bordered border-dark shadow">
                 <thead>
                   <tr class="m-0 p-0">
-                    <th class="bg-light text-dark my-1 py-1" scope="col">ID</th>
+                    <th class="bg-light text-dark my-1 py-1" scope="col">
+                      STATE ID
+                    </th>
                     <th class="bg-light text-dark my-1 py-1" scope="col">
                       #y1
                     </th>
@@ -365,21 +432,47 @@
                   </tr>
                   <tr>
                     <td colspan="3" class="m-0 p-0">
-                      <input
-                        type="text"
-                        class="form-control border-white"
-                        value="Start state"
-                      />
+                      <div class="btn-group" style="width: calc(100% - 15px)">
+                        <div class="col mt-1 ms-1 p-0" style="max-width: 32px">
+                          &nbsp;&nbsp;<i class="fa-solid fa-code"></i>
+                        </div>
+                        <div class="col m-0 p-0">
+                          <input
+                            type="text"
+                            class="form-control border-white m-1 p-0"
+                            value="Start state"
+                          />
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="3" class="m-0 p-0">
+                      <div class="btn-group" style="width: calc(100% - 15px)">
+                        <div class="col mt-1 ms-1 p-0" style="max-width: 32px">
+                          &nbsp;&nbsp;<i class="fa-solid fa-quote-left"></i>
+                        </div>
+                        <div class="col m-0 p-0">
+                          <input
+                            type="text"
+                            class="form-control border-white m-1 p-0"
+                            value="Start state"
+                          />
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
-              </table>
+              </table>-->
+              <!-- XXX -->
 
               <div class="my-4"></div>
 
               <h4 class="mt-3">
                 <i class="fa-solid fa-square-minus"></i> &nbsp; SIGNALS
               </h4>
+
+              <div id="signals">(empty)</div>
 
               <table class="table table-bordered border-dark shadow">
                 <thead>
@@ -484,7 +577,7 @@
                         </ul>
                       </div>
                     </td>
-                    <td class="m-0 py-1">
+                    <td class="m-0 py-1 text-center">
                       <button
                         type="button"
                         class="btn btn-sm btn-outline-dark"
@@ -529,6 +622,7 @@
               <div class="text-center">
                 <button
                   type="button"
+                  id="addSignal"
                   class="btn btn-sm btn-outline-dark shadow"
                   data-bs-toggle="tooltip"
                   data-bs-placement="bottom"
@@ -646,7 +740,7 @@ end architecture;
           numberConverterDec.value.length == 0
             ? 0
             : parseInt(numberConverterDec.value, 10);
-        numberConverterHex.value = "" + val.toString(16);
+        numberConverterHex.value = "" + val.toString(16).toUpperCase();
         numberConverterBin.value = "" + val.toString(2);
       });
       // ----- end of number converter -----
@@ -655,13 +749,14 @@ end architecture;
       var ctx = c.getContext("2d");
 
       window.onload = (event) => {
-        draw();
+        //draw();
+        resize();
         activateTooltips();
       };
 
       onresize = (event) => {
         resize();
-        draw();
+        // TODO: must call webSTDE.call();
       };
 
       function resize() {
@@ -671,7 +766,7 @@ end architecture;
         );
       }
 
-      function draw() {
+      /*function draw() {
         resize();
 
         ctx.font = "28px Arial";
@@ -682,7 +777,7 @@ end architecture;
         drawState(500, 450, 220, 100, "stop");
         drawState(800, 450, 220, 100, "blub");
         drawTransition(500, 250 + 100 / 2, 500, 450 - 100 / 2);
-      }
+      }*/
 
       function drawState(x, y, width, height, label = "") {
         ctx.lineWidth = 2;
