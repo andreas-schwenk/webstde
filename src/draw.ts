@@ -51,3 +51,32 @@ export function drawState(
   ctx.textAlign = "center";
   ctx.fillText(label, pos.x, pos.y - height / 6);
 }
+
+export function drawTransition(
+  ctx: CanvasRenderingContext2D,
+  selected: boolean,
+  posStart: Pos2D,
+  posEnd: Pos2D
+) {
+  if (selected) {
+    ctx.strokeStyle = "blue";
+    ctx.fillStyle = "blue";
+    ctx.lineWidth = 4;
+  } else {
+    ctx.strokeStyle = "black";
+    ctx.fillStyle = "black";
+    ctx.lineWidth = 2;
+  }
+  // line
+  ctx.moveTo(posStart.x, posStart.y);
+  ctx.lineTo(posEnd.x, posEnd.y);
+  ctx.stroke();
+  // arrow
+  /*ctx.beginPath();
+  const sizeX = 7;
+  const sizeY = 12;
+  ctx.moveTo(x2 - sizeX, y2 - sizeY);
+  ctx.lineTo(x2 + sizeX, y2 - sizeY);
+  ctx.lineTo(x2, y2);
+  ctx.fill();*/
+}
