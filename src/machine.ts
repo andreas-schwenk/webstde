@@ -69,6 +69,31 @@ export class StateMachine {
     return pos;
   }
 
+  public removeSignal(signal: Signal): void {
+    const idx = this.signals.indexOf(signal);
+    if (idx !== -1) {
+      this.signals.splice(idx, 1);
+    }
+  }
+
+  public moveUpSignal(signal: Signal): void {
+    const idx = this.signals.indexOf(signal);
+    if (idx > 0) {
+      const tmp = this.signals[idx];
+      this.signals[idx] = this.signals[idx - 1];
+      this.signals[idx - 1] = tmp;
+    }
+  }
+
+  public moveDownSignal(signal: Signal): void {
+    const idx = this.signals.indexOf(signal);
+    if (idx >= 0 && idx + 1 < this.signals.length) {
+      const tmp = this.signals[idx];
+      this.signals[idx] = this.signals[idx + 1];
+      this.signals[idx + 1] = tmp;
+    }
+  }
+
   private recalculateStateIndices(): void {
     const n = this.states.length;
     for (let i = 0; i < n; i++) {
@@ -113,8 +138,32 @@ export class Signal {
   public setId(id: string): void {
     this.id = id;
   }
+  public setType(type: SignalType): void {
+    this.type = type;
+  }
+  public getType(): SignalType {
+    return this.type;
+  }
   public getId(): string {
     return this.id;
+  }
+  public setBits(bits: number): void {
+    this.bits = bits;
+  }
+  public getBits(): number {
+    return this.bits;
+  }
+  public setDirection(dir: SignalDirection): void {
+    this.direction = dir;
+  }
+  public getDirection(): SignalDirection {
+    return this.direction;
+  }
+  public setDesc(desc: string): void {
+    this.desc = desc;
+  }
+  public getDesc(): string {
+    return this.desc;
   }
 
   public toJSON(): JSON_Signal {
@@ -129,16 +178,16 @@ export class Signal {
 }
 
 export enum SignalType {
-  Bit = "bit",
-  BitN = "bit_n",
-  Signed = "signed",
-  Unsigned = "unsigned",
+  Bit = "BIT",
+  BitN = "BIT_N",
+  Signed = "SIGNED",
+  Unsigned = "UNSIGNED",
 }
 
 export enum SignalDirection {
-  Input = "input",
-  Output = "output",
-  InputOutput = "inputOutput",
+  Input = "IN",
+  Output = "OUT",
+  InputOutput = "INOUT",
 }
 
 export class State {
