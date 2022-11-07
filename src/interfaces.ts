@@ -29,6 +29,7 @@ export interface JSON_State {
   x: number;
   y: number;
   q: { [signalName: string]: string };
+  code: string;
   desc: string;
 }
 
@@ -38,4 +39,15 @@ export interface JSON_Transition {
   "u.angle": number;
   "v.angle": number;
   cond: string;
+}
+
+export interface JSON_StateMachine {
+  id: string;
+  signals: JSON_Signal[];
+  states: JSON_State[];
+}
+
+export interface Pos2D {
+  x: number;
+  y: number;
 }
